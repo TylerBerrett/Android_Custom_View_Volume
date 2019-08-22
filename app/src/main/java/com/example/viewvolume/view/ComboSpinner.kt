@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.storage.StorageVolume
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 
 class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
@@ -15,23 +17,24 @@ class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attr
     private val paintKnobCircle = Paint()
 
     private var startX: Float = 0f
-    private var startY: Float = 0f
-    private var diffX: Float = 0f
-    private var diffY: Float = 0f
+    private var distanceTraveled: Float = 0f
+    private var lastLocation: Float = 0f
 
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when(event?.action) {
             MotionEvent.ACTION_DOWN -> {
                 startX = event.x
-                startY = event.y
+                println(distanceTraveled)
             }
             MotionEvent.ACTION_MOVE -> {
-                //event.x - startX
-                //startY + event.y
-                val distanceTraveled = startX 
-                diffX = distanceTraveled + width/2f
+                distanceTraveled = event.x - startX + lastLocation
+            }
 
+            MotionEvent.ACTION_UP -> {
+                limitRange()
+                Toast.makeText(context, "${(distanceTraveled/280f) * 100}%", Toast.LENGTH_LONG).show()
+                lastLocation = distanceTraveled
             }
         }
         invalidate()
@@ -44,7 +47,9 @@ class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attr
         val mainRadius = width/2.2f
         val borderRadius = mainRadius * .9f
 
-        canvas?.rotate(diffX, centerX, centerY)
+        limitRange()
+        println(distanceTraveled)
+        canvas?.rotate(distanceTraveled, centerX, centerY)
 
         //Main black circle
         canvas?.drawCircle(centerX, centerY, mainRadius, paintMainCircle)
@@ -61,4 +66,19 @@ class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attr
 
         super.onDraw(canvas)
     }
+
+    private fun limitRange(){
+        when{
+            distanceTraveled <= 0 -> distanceTraveled = 0f
+            distanceTraveled >= 280f -> distanceTraveled = 280f
+        }
+    }
+
+    fun getVolume(): Float {
+        return lastLocation
+    }
+    fun setVolume(volume: Float){
+        lastLocation = volume
+    }
+
 }
