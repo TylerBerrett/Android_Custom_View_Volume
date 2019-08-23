@@ -12,13 +12,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        button_get.setOnClickListener {
+        /*button_get.setOnClickListener {
             button_get.text = ComboSpinner(this, null).getVolume().toString()
         }
 
         button_set.setOnClickListener {
             ComboSpinner(this, null).setVolume(33f)
-        }
+        }*/
+
 
 
     }

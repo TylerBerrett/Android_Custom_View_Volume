@@ -4,13 +4,28 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.os.storage.StorageVolume
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.example.viewvolume.R
 
 class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+
+   var mainCircleColor: Int? = Color.BLACK
+   var borderCircleColor: Int? = Color.BLACK
+   var knobCircleColor: Int? = Color.BLACK
+
+    init {
+        val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.ComboSpinner)
+        val mainCircleColor2 = typedArray?.getColor(R.styleable.ComboSpinner_colorCircle, Color.BLACK)
+        val borderCircleColor2 = typedArray?.getColor(R.styleable.ComboSpinner_colorBorder, Color.GREEN)
+        val knobCircleColor2 = typedArray?.getColor(R.styleable.ComboSpinner_colorKnob, Color.BLUE)
+        mainCircleColor = mainCircleColor2
+        borderCircleColor = borderCircleColor2
+        knobCircleColor = knobCircleColor2
+        typedArray?.recycle()
+    }
 
     private val paintMainCircle = Paint()
     private val paintBorderCircle = Paint()
@@ -20,12 +35,10 @@ class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attr
     private var distanceTraveled: Float = 0f
     private var lastLocation: Float = 0f
 
-
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when(event?.action) {
             MotionEvent.ACTION_DOWN -> {
                 startX = event.x
-                println(distanceTraveled)
             }
             MotionEvent.ACTION_MOVE -> {
                 distanceTraveled = event.x - startX + lastLocation
@@ -47,20 +60,22 @@ class ComboSpinner(context: Context?, attrs: AttributeSet?) : View(context, attr
         val mainRadius = width/2.2f
         val borderRadius = mainRadius * .9f
 
+
+
         limitRange()
-        println(distanceTraveled)
         canvas?.rotate(distanceTraveled, centerX, centerY)
 
         //Main black circle
+        paintMainCircle.color = mainCircleColor!!
         canvas?.drawCircle(centerX, centerY, mainRadius, paintMainCircle)
 
         //Green hollow circle
         paintBorderCircle.style = Paint.Style.STROKE
-        paintBorderCircle.color = Color.GREEN
+        paintBorderCircle.color = borderCircleColor!!
         canvas?.drawCircle(centerX, centerY, borderRadius, paintBorderCircle)
 
         //Volume circle
-        paintKnobCircle.color = Color.BLUE
+        paintKnobCircle.color = knobCircleColor!!
         canvas?.drawCircle(centerX - borderRadius * .5f, centerY + borderRadius *.6f, borderRadius *.15f, paintKnobCircle)
 
 
